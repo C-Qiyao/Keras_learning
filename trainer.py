@@ -1,6 +1,7 @@
 from cmd import IDENTCHARS
 from PIL import Image
 import numpy as np
+import datetime
 import os
 # TensorFlow and tf.keras
 import tensorflow as tf
@@ -56,12 +57,16 @@ print(tf.__version__)
 '''
 model.summary()
 
+
 model.compile(
                 optimizer='adam',
             #optimizer= tf.keras.optimizers.SGD(lr = 0.1),
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-history=model.fit(facelist, idlist, epochs=10)
+log_dir="logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+history=model.fit(facelist, idlist, epochs=10,
+          callbacks=[tensorboard_callback])
 print(history.history.keys())
 plt.plot(history.history['loss'])
 plt.plot(history.history['accuracy'])

@@ -6,7 +6,7 @@ from tensorflow import keras
 class_names = ['Chen Qiyao', 'Zhang Zy','Ma Dh','Han Yl','unknow']
 face_detector = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 font = cv2.FONT_HERSHEY_SIMPLEX
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 model = keras.Sequential([
     keras.layers.Conv2D(16, kernel_size=(5,5), activation='relu', input_shape=(128, 128,1)),
@@ -27,6 +27,7 @@ model.compile(
 print('model loaded')
 a=0
 while True:
+    pre=0
     sucess, img = cap.read()
 
      # 转为灰度图片
@@ -43,7 +44,8 @@ while True:
         a=np.argmax(predictions)
         if predictions[0][a] <0.9:
             a=-1
-    cv2.putText(img, class_names[a], (50,50), font, 1, (0, 0, 255), 3)
+        pre=predictions[0][a]
+    cv2.putText(img, class_names[a]+str('%.2f' % (pre*100))+'%', (50,50), font, 1, (0, 0, 255), 3)
     cv2.imshow('face',img)
     k = cv2.waitKey(1)
     if k == 27:    #按 'ESC' to quit
